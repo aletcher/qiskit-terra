@@ -23,6 +23,8 @@ from qiskit.quantum_info.operators.base_operator import BaseOperator
 from qiskit.quantum_info import Statevector
 from qiskit.opflow import PauliSumOp
 from qiskit.primitives import Estimator
+from qiskit.quantum_info import SparsePauliOp
+
 
 from .bind import bind
 from .derive_circuit import derive_circuit
@@ -182,19 +184,31 @@ class ReverseEstimatorGradient(BaseEstimatorGradient):
         return 2 * gradient
 
 
+# def _evolve_by_operator(operator, state):
+#     """Evolve the Statevector state by operator."""
+
+#     # try casting to sparse matrix and use sparse matrix-vector multiplication, which is
+#     # a lot faster than using Statevector.evolve
+#     if isinstance(operator, PauliSumOp):
+#         operator = operator.primitive * operator.coeff
+
+#     try:
+#         spmatrix = operator.to_matrix(sparse=True)
+#         evolved = spmatrix @ state.data
+#         return Statevector(evolved)
+#     except (TypeError, AttributeError):
+#         logger.info("Operator is not castable to a sparse matrix, using Statevector.evolve.")
+
+#     return state.evolve(operator)
+
+
 def _evolve_by_operator(operator, state):
-    """Evolve the Statevector state by operator."""
+    """ALISTAIR EDIT IN ORDER TO PASS SPARSE MATRIX"""
 
-    # try casting to sparse matrix and use sparse matrix-vector multiplication, which is
-    # a lot faster than using Statevector.evolve
-    if isinstance(operator, PauliSumOp):
-        operator = operator.primitive * operator.coeff
-
-    try:
+    if isinstance(operator, SparsePauliOp):
         spmatrix = operator.to_matrix(sparse=True)
-        evolved = spmatrix @ state.data
-        return Statevector(evolved)
-    except (TypeError, AttributeError):
-        logger.info("Operator is not castable to a sparse matrix, using Statevector.evolve.")
-
-    return state.evolve(operator)
+    else:
+        spmatrix = operator
+        
+    evolved = spmatrix @ state.data
+    return Statevector(evolved)

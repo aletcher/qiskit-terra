@@ -141,7 +141,9 @@ class BaseEstimatorGradient(ABC):
                 for i, params in enumerate(parameters)
             ]
         # Validate the arguments.
-        self._validate_arguments(circuits, observables, parameter_values, parameters)
+        """ATTENTION : ALISTAIR COMMENTED THE LINE BELOW IN ORDER TO PASS SPARSE MATRICES TO REVERSE GRADIENT ESTIMATOR."""
+        # self._validate_arguments(circuits, observables, parameter_values, parameters)
+        """ATTENTION : ALISTAIR COMMENTED THE LINE ABOVE IN ORDER TO PASS SPARSE MATRICES TO REVERSE GRADIENT ESTIMATOR."""
         # The priority of run option is as follows:
         # options in ``run`` method > gradient's default options > primitive's default setting.
         opts = copy(self._default_options)
